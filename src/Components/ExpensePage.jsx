@@ -1,6 +1,7 @@
 import React, { useEffect, useRef, useState } from "react";
 import {
   deleteDataFromFirebase,
+  editDataInFirebase,
   getDataFromFirebase,
   getExpense,
   postDataOnFirebase,
@@ -17,26 +18,64 @@ export default function ExpensePage() {
   const dispatch = useDispatch();
 
   const [Expenses, setNewExp] = useState([]);
+  const [edit, setEdit] = useState(false);
+  const [editedExpenseId, setEditedExpenseId] = useState(null);
+  const [editedExpenseObj, setEditedExpense] = useState(null);
+
+  const editHandler = (expen) => {
+    setEdit(true);
+    expenseAmount.current.value = expen.expAmt;
+    description.current.value = expen.desc;
+    category.current.value = expen.categ;
+    date.current.value = expen.date;
+    setEditedExpenseId(expen.firebaseId);
+  };
 
   const submitHandler = (e) => {
     e.preventDefault();
-    
-    const obj = {
-      expAmt: expenseAmount.current.value,
-      desc: description.current.value,
-      categ: category.current.value,
-      date: date.current.value,
-    };
-    
 
-    dispatch(postDataOnFirebase(obj));
-    setNewExp((prevExpenses) => [...prevExpenses, obj]);
+    if (edit) {
+      const updatedValues = {
+        expAmt: expenseAmount.current.value,
+        desc: description.current.value,
+        categ: category.current.value,
+        date: date.current.value,
+        firebaseId: editedExpenseId,
+      };
+      setEditedExpense(updatedValues);
+      const updatedArray = Expenses.map((item) => {
+        if (item.firebaseId === updatedValues.firebaseId) {
+          return updatedValues;
+        }
+        return item;
+      });
+      setNewExp(updatedArray);
+    } else {
+      const obj = {
+        expAmt: expenseAmount.current.value,
+        desc: description.current.value,
+        categ: category.current.value,
+        date: date.current.value,
+      };
+
+      dispatch(postDataOnFirebase(obj));
+      setNewExp((prevExpenses) => [...prevExpenses, obj]);
+    }
+    setEdit(false);
   };
-  useEffect(() => {
-    
-    dispatch(getDataFromFirebase());
 
-    
+  if (editedExpenseObj && editedExpenseId) {
+    console.log(
+      "editedExpenseObj==>",
+      editedExpenseObj,
+      " || editedExpenseId==> ",
+      editedExpenseId
+    );
+
+    dispatch(editDataInFirebase(editedExpenseObj));
+  }
+  useEffect(() => {
+    dispatch(getDataFromFirebase());
   }, []);
 
   const { expFromDB: exp } = useSelector((state) => {
@@ -52,7 +91,6 @@ export default function ExpensePage() {
     return total.toFixed(2);
   };
   const deleteHandler = (exp) => {
-    
     dispatch(deleteDataFromFirebase(exp.firebaseId));
 
     setNewExp((prevExpenses) => {
@@ -62,8 +100,6 @@ export default function ExpensePage() {
 
       return updatedExpenses;
     });
-
-    
   };
 
   return (
@@ -117,13 +153,21 @@ export default function ExpensePage() {
               placeholder="dd-mm-yyyy"
             />
             <br />
-
-            <button
-              type="submit"
-              className="mt-3  ml-[35%] text-white bg-gradient-to-r from-purple-500 via-purple-600 to-purple-700 hover:bg-gradient-to-br focus:ring-4 focus:outline-none focus:ring-purple-300 dark:focus:ring-purple-800 shadow-lg shadow-purple-500/50 dark:shadow-lg dark:shadow-purple-800/80 font-medium rounded-lg text-sm px-5 py-2.5 text-center me-2 mb-2"
-            >
-              Add Expenses
-            </button>
+            {edit ? (
+              <button
+                type="submit"
+                className="mt-3  ml-[35%] text-white bg-gradient-to-r from-purple-500 via-purple-600 to-purple-700 hover:bg-gradient-to-br focus:ring-4 focus:outline-none focus:ring-purple-300 dark:focus:ring-purple-800 shadow-lg shadow-purple-500/50 dark:shadow-lg dark:shadow-purple-800/80 font-medium rounded-lg text-sm px-5 py-2.5 text-center me-2 mb-2"
+              >
+                Submit Edited Value
+              </button>
+            ) : (
+              <button
+                type="submit"
+                className="mt-3  ml-[35%] text-white bg-gradient-to-r from-purple-500 via-purple-600 to-purple-700 hover:bg-gradient-to-br focus:ring-4 focus:outline-none focus:ring-purple-300 dark:focus:ring-purple-800 shadow-lg shadow-purple-500/50 dark:shadow-lg dark:shadow-purple-800/80 font-medium rounded-lg text-sm px-5 py-2.5 text-center me-2 mb-2"
+              >
+                Add Expenses
+              </button>
+            )}
           </form>
         </div>
         {/* EXPENSE TOTAL RIGHT ,  SUM UP*/}
@@ -152,6 +196,7 @@ export default function ExpensePage() {
               Rs.{exp.expAmt}- {exp.desc}
             </span>
             <button
+              onClick={() => editHandler(exp)}
               type="button"
               className="text-gray-900 bg-gradient-to-r from-lime-200 via-lime-400 to-lime-500 hover:bg-gradient-to-br focus:ring-4 focus:outline-none focus:ring-lime-300 dark:focus:ring-lime-800 shadow-lg shadow-lime-500/50 dark:shadow-lg dark:shadow-lime-800/80 font-medium rounded-lg text-sm px-5 py-2.5 text-center me-2 mb-3"
             >

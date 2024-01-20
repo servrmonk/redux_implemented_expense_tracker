@@ -22,14 +22,13 @@ export const { setExpense, getExpense } = expenseSlice.actions;
 export default expenseSlice.reducer;
 
 export const postDataOnFirebase = (action) => {
-  
   return async function postDataOnFb(dispatch) {
     let url = `https://expense-tracker-b82dc-default-rtdb.firebaseio.com/.json`;
-    
+
     try {
       const response = await axios.post(url, action);
       const data = await response.data;
-      
+
       dispatch(setExpense(data)); //action call
     } catch (error) {
       console.log("Error in postData", error);
@@ -56,32 +55,42 @@ export const getDataFromFirebase = () => {
     try {
       const response = await axios.get(url);
       let respObj = response.data;
-      
 
       const newArrayOfValue = [];
       for (const key in respObj) {
         const value = respObj[key];
         newArrayOfValue.push({ ...value, firebaseId: key });
       }
-      
-      dispatch(getExpense(newArrayOfValue));
 
-      
+      dispatch(getExpense(newArrayOfValue));
     } catch (error) {
       console.log("Error in GetData", error);
     }
   };
 };
 export const deleteDataFromFirebase = (action) => {
-  
   return async function delHandler() {
-    
     const url = `https://expense-tracker-b82dc-default-rtdb.firebaseio.com/${action}.json`;
     try {
       const responseInDeleteHandler = await axios.delete(url);
-      
     } catch (error) {
       console.log("Error ", error);
+    }
+  };
+};
+export const editDataInFirebase = (action) => {
+  
+  
+  return async function editHandler(dispatch) {
+  
+
+    let url = `https://expense-tracker-b82dc-default-rtdb.firebaseio.com/${action.firebaseId}.json`;
+    // console.log("value of object before put request ", obj);
+    try {
+      const response = await axios.put(url, action);
+      console.log("Response in editDataInFirebase ", response);
+    } catch (error) {
+      console.log("Error in editDataInFirebase", error);
     }
   };
 };
