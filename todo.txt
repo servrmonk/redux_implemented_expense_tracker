@@ -1,0 +1,10 @@
+1. creating signup
+2. login 
+3. complete ur profile 
+4. Edit User Details
+5. Verify User Email
+6. Logout User	
+7. Forgot Password Workflow	
+8. Adding Expenses for tracking purpose	
+9. Integrating it with firebase	
+10. Editing and Deleting Expenses	
