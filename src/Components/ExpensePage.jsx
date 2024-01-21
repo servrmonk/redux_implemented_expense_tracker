@@ -284,7 +284,7 @@ export default function ExpensePage() {
       {/* CURRENT EXPENSE LEFT DOWN  */}
       <div
         className={` ${
-          toggleThemeStatus ? "bg-slate-800" : "bg-neutral-100 "
+          toggleThemeStatus ? "bg-slate-800 max-h-full" : "bg-neutral-100 "
         }  pt-1`}
       >
         {Expenses.length > 0 &&

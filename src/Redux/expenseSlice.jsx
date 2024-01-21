@@ -26,8 +26,18 @@ export const { setExpense, getExpense,totalExpenseFun } = expenseSlice.actions;
 export default expenseSlice.reducer;
 
 export const postDataOnFirebase = (action) => {
+  let email =  localStorage.getItem('email') || false;
+  
+  function cleanGmailAddress(emailid) {
+    if (emailid) {
+      return emailid.replaceAll(`@`, "").replaceAll(".", "");
+    }
+  }
+  let cleanEmail = cleanGmailAddress(email);
+  // console.log("clean email ",cleanEmail);
+
   return async function postDataOnFb(dispatch) {
-    let url = `https://expense-tracker-b82dc-default-rtdb.firebaseio.com/.json`;
+    let url = `https://expense-tracker-b82dc-default-rtdb.firebaseio.com/${cleanEmail}.json`;
 
     try {
       const response = await axios.post(url, action);
@@ -54,8 +64,18 @@ export const postDataOnFirebase = (action) => {
 };
 
 export const getDataFromFirebase = () => {
+  let email =  localStorage.getItem('email') || false;
+  
+  function cleanGmailAddress(emailid) {
+    if (emailid) {
+      return emailid.replaceAll(`@`, "").replaceAll(".", "");
+    }
+  }
+  let cleanEmail = cleanGmailAddress(email);
+  // console.log("clean email ",cleanEmail);
+
   return async function getData(dispatch) {
-    let url = `https://expense-tracker-b82dc-default-rtdb.firebaseio.com/.json`;
+    let url = `https://expense-tracker-b82dc-default-rtdb.firebaseio.com/${cleanEmail}.json`;
     try {
       const response = await axios.get(url);
       let respObj = response.data;
@@ -73,8 +93,17 @@ export const getDataFromFirebase = () => {
   };
 };
 export const deleteDataFromFirebase = (action) => {
+  let email =  localStorage.getItem('email') || false;
+  
+  function cleanGmailAddress(emailid) {
+    if (emailid) {
+      return emailid.replaceAll(`@`, "").replaceAll(".", "");
+    }
+  }
+  let cleanEmail = cleanGmailAddress(email);
+  console.log("clean email ",cleanEmail);
   return async function delHandler() {
-    const url = `https://expense-tracker-b82dc-default-rtdb.firebaseio.com/${action}.json`;
+    const url = `https://expense-tracker-b82dc-default-rtdb.firebaseio.com/${cleanEmail}/${action}.json`;
     try {
       const responseInDeleteHandler = await axios.delete(url);
     } catch (error) {
@@ -83,12 +112,19 @@ export const deleteDataFromFirebase = (action) => {
   };
 };
 export const editDataInFirebase = (action) => {
+  let email =  localStorage.getItem('email') || false;
   
+  function cleanGmailAddress(emailid) {
+    if (emailid) {
+      return emailid.replaceAll(`@`, "").replaceAll(".", "");
+    }
+  }
+  let cleanEmail = cleanGmailAddress(email);
   
   return async function editHandler(dispatch) {
   
 
-    let url = `https://expense-tracker-b82dc-default-rtdb.firebaseio.com/${action.firebaseId}.json`;
+    let url = `https://expense-tracker-b82dc-default-rtdb.firebaseio.com/${cleanEmail}/${action.firebaseId}.json`;
     // console.log("value of object before put request ", obj);
     try {
       const response = await axios.put(url, action);
