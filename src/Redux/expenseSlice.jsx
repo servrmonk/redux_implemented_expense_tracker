@@ -4,6 +4,7 @@ import axios from "axios";
 const initialStateForExpense = {
   tempExp: [],
   expFromDB: [],
+  totalExpense:0,
 };
 const expenseSlice = createSlice({
   name: "ExpenseSlice",
@@ -15,10 +16,13 @@ const expenseSlice = createSlice({
     getExpense(state, action) {
       state.expFromDB = action.payload;
     },
+    totalExpenseFun(state,action){
+      state.totalExpense = action.payload
+    }
   },
 });
 
-export const { setExpense, getExpense } = expenseSlice.actions;
+export const { setExpense, getExpense,totalExpenseFun } = expenseSlice.actions;
 export default expenseSlice.reducer;
 
 export const postDataOnFirebase = (action) => {
